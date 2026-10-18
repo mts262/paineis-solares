@@ -20,7 +20,7 @@ public class Main {
         // Gera leituras para N painéis solares
         Map<PainelSolar, List<Leitura>> leiturasPorPainel = new TreeMap<>();
         for (int i = 0; i < TOTAL_PAINEIS; i++) {
-            leiturasPorPainel.put(new PainelSolar("PS_" +String.format("%03d", i)),
+            leiturasPorPainel.put(new PainelSolar("PS_" +String.format("%03d", i+1)),
                     sensoriamento.capturarLeituras(TOTAL_LEITURAS));
         }
 
