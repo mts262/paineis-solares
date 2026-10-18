@@ -38,7 +38,7 @@ public class OperacoesImpl implements Operacoes<PainelSolar, Leitura> {
         }
     }
 
-    // Complexidade: O(MNlogN), pois percorre os M painéis solares e ordena a lista
+    // A omplexidade é O(MNlogN), pois percorre os M painéis solares e ordena a lista
     // de até N leituras de cada painel, cuja ordenação tem complexidade. A cópia das
     // listas também exige tempo proporcional à quantidade de leituras.
     // Com o aumento da quantidade de painéis e leituras, o tempo de execução aumenta.
@@ -61,49 +61,64 @@ public class OperacoesImpl implements Operacoes<PainelSolar, Leitura> {
         return ordenadas;
     }
 
-    // A complexidade: O(NM+N^2), pois percorre os N painéis e a suas M leituras para calcular
-    // as potências médias. Depois, compara cada painel com os demais, realizando O(N^2) comparações.
-    // Com muitos painéis e leituras, o tempo de execução aumenta devido ao cálculo das médias e,
-    // principalmente, às comparações quadráticas entre os painéis.
+    // A complexidade é O(MN^2), onde M é o número de painéis solares e N é a quantidade de leituras por painel.
+    // Para cada painel, dois loops aninhados comparam as potências das leituras entre si, resultando em O(N^2) por painel.
+    // O tempo de execução cresce quadraticamente com o número de leituras e linearmente com o número de painéis.
     @Override
-    public List<PainelSolar> compararDesempenho(Map<PainelSolar, List<Leitura>> leiturasPorMonitorado) {
-        List<PainelSolar> baixoDesempenho = new ArrayList<>();
+    public void analisarLeiturasDiscrepantes(Map<PainelSolar, List<Leitura>> leiturasPorMonitorado) {
 
-        Map<PainelSolar, Double> potenciaPainel = new HashMap<>();
-        for (PainelSolar painel: leiturasPorMonitorado.keySet()) {
-            double potenciaMedia = 0;
+        double diferencaMinima = 30.0;
+        double percentualMinimo = 0.75;
 
-            List<Leitura> leituras = leiturasPorMonitorado.get(painel);
+        System.out.println("ANALISANDO LEITURAS DISCREPANTES DE POTÊNCIA DOS PAINÉIS SOLARES...");
+        for (Map.Entry<PainelSolar, List<Leitura>> entrada : leiturasPorMonitorado.entrySet()) {
+
+            PainelSolar painel = entrada.getKey();
+            List<Leitura> leituras = entrada.getValue();
+
+            int totalDiscrepantes = 0;
+
             for (int i = 0; i < leituras.size(); i++) {
-                potenciaMedia+= leituras.get(i).getPotencia();
-            }
+                double potenciaAtual = leituras.get(i).getPotencia();
+                int diferencas = 0;
 
-            if (leituras.size() == 0) {
-                continue;
-            }
+                for (int j = 0; j < leituras.size(); j++) {
 
-            potenciaMedia = potenciaMedia / leituras.size();
+                    if (i == j) {
+                        continue;
+                    }
 
-            potenciaPainel.put(painel, potenciaMedia);
-        }
+                    double potenciaComparada = leituras.get(j).getPotencia();
 
-        System.out.println("PAINÉIS COM POTÊNCIA MÉDIA INFERIOR À DA MAIORIA:");
-        List<Map.Entry<PainelSolar, Double>> paineis = new ArrayList<>(potenciaPainel.entrySet());
-        for (int i = 0; i < paineis.size(); i++) {
-            double desempenho = paineis.get(i).getValue();
-            int paineisMelhores = 0;
+                    if (Math.abs(potenciaAtual - potenciaComparada)
+                            > diferencaMinima) {
+                        diferencas++;
+                    }
+                }
 
-            for (int j = 0; j < paineis.size(); j++) {
-                if (i != j && paineis.get(j).getValue() > desempenho) {
-                    paineisMelhores++;
+                int totalComparacoes = leituras.size() - 1;
+
+                if (totalComparacoes > 0
+                        && diferencas >= totalComparacoes * percentualMinimo) {
+
+                    System.out.printf(
+                            "Painel %s - Leitura %d com potência discrepante: %.2fW%n",
+                            painel.getIdPainel(),
+                            i + 1,
+                            potenciaAtual
+                    );
+
+                    totalDiscrepantes++;
                 }
             }
 
-            if (paineisMelhores > (paineis.size() - 1) / 2.0) {
-                baixoDesempenho.add(paineis.get(i).getKey());
-            }
+            System.out.printf(
+                    "%s: %d de %d leituras discrepantes.%n",
+                    painel.getIdPainel(),
+                    totalDiscrepantes,
+                    leituras.size()
+            );
+            System.out.println();
         }
-
-        return baixoDesempenho;
     }
 }

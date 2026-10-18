@@ -15,5 +15,5 @@ public interface Operacoes <P, L>{
     public Map<P, List<L>> ordenar(Map<P, List<L>> leiturasPorMonitorado);
 
     // d.4
-    public List<P> compararDesempenho(Map<P, List<L>> leiturasPorMonitorado);
+    public void analisarLeiturasDiscrepantes(Map<P, List<L>> leiturasPorMonitorado);
 }

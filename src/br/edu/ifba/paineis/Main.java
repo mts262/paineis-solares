@@ -37,8 +37,6 @@ public class Main {
         operacoes.imprimirLeituras(ordenado);
 
         // d.4
-        List<PainelSolar> baixoDesempenho = operacoes.compararDesempenho(leiturasPorPainel);
-        operacoes.imprimir(baixoDesempenho);
-
+        operacoes.analisarLeiturasDiscrepantes(leiturasPorPainel);
     }
 }
